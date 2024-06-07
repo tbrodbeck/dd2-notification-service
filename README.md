@@ -1,4 +1,4 @@
-# Dd2-notification-service
+# Deep Dip 2 Notification Service
 
 A dockerized service that sends you a notification when players come close to WR on the Deep Dip 2 competition.
 
