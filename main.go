@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/robfig/cron/v3"
@@ -61,9 +62,14 @@ func getReferenceHeight() {
 
 	var data []LeaderboardEntry
 	json.Unmarshal(body, &data)
+
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Height > data[j].Height // Sort by Value field in ascending order
+	})
 	log.Printf("Leaderboard: %v...", data[:10])
+
 	referenceHeight = int(data[SECRET_PLAYERS].Height) - MAX_DROP_HEIGHT
-	log.Printf("Waiting for players on height %d", referenceHeight)
+	log.Printf("Waiting for players reaching height %d", referenceHeight)
 
 }
 
@@ -88,7 +94,6 @@ func checkHeight() {
 	}
 
 	var drivingInfo = fmt.Sprintf("%d:", len(data))
-	// log.Printf("%d driving: %v...", len(data), data[:nr_players_to_display])
 	for index, player := range data {
 		drivingInfo += fmt.Sprintf(" %d %s %d", player.Rank, player.Name, int(player.Height))
 		if index == nr_players_to_display-1 {
