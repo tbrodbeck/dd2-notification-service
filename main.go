@@ -64,7 +64,7 @@ func getReferenceHeight() {
 	json.Unmarshal(body, &data)
 
 	sort.Slice(data, func(i, j int) bool {
-		return data[i].Height > data[j].Height // Sort by Value field in ascending order
+		return data[i].Height > data[j].Height // Sort by Value field in descending order
 	})
 	log.Printf("Leaderboard: %v...", data[:10])
 
