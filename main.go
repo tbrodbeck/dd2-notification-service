@@ -9,25 +9,23 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"sort"
-	"strconv"
 
 	"github.com/robfig/cron/v3"
 )
 
-var referenceHeight int
+var referenceHeight int = 1777
 var notified bool = false
 
-func readEnvironmentInteger(name string) int {
-	parameter, err := strconv.Atoi(os.Getenv(name))
-	if err != nil {
-		log.Fatal(err, ". Failed to read environment variable: ", name)
-	}
-	return parameter
-}
+// func readEnvironmentInteger(name string) int {
+// 	parameter, err := strconv.Atoi(os.Getenv(name))
+// 	if err != nil {
+// 		log.Fatal(err, ". Failed to read environment variable: ", name)
+// 	}
+// 	return parameter
+// }
 
-var MAX_DROP_HEIGHT = readEnvironmentInteger("MAX_DROP_HEIGHT")
-var SECRET_PLAYERS = readEnvironmentInteger("SECRET_PLAYERS")
+// var MAX_DROP_HEIGHT = readEnvironmentInteger("MAX_DROP_HEIGHT")
+// var SECRET_PLAYERS = readEnvironmentInteger("SECRET_PLAYERS")
 var PUSHME_ID = os.Getenv("PUSHME_ID")
 var MYNOTIFIER_API_KEY = os.Getenv("MYNOTIFIER_API_KEY")
 
@@ -48,30 +46,30 @@ type NotifyPayload struct {
 	Text      string `json:"text"`
 }
 
-func getReferenceHeight() {
-	resp, err := http.Get("https://dips-plus-plus.xk.io/leaderboard/global")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
+// func getReferenceHeight() {
+// 	resp, err := http.Get("https://dips-plus-plus.xk.io/leaderboard/global")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	body, err := ioutil.ReadAll(resp.Body)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	var data []LeaderboardEntry
-	json.Unmarshal(body, &data)
+// 	var data []LeaderboardEntry
+// 	json.Unmarshal(body, &data)
 
-	sort.Slice(data, func(i, j int) bool {
-		return data[i].Height > data[j].Height // Sort by Value field in descending order
-	})
-	log.Printf("Leaderboard: %v...", data[:10])
+// 	sort.Slice(data, func(i, j int) bool {
+// 		return data[i].Height > data[j].Height // Sort by Value field in descending order
+// 	})
+// 	log.Printf("Leaderboard: %v...", data[:10])
 
-	referenceHeight = int(data[SECRET_PLAYERS].Height) - MAX_DROP_HEIGHT
-	log.Printf("Waiting for players reaching height %d", referenceHeight)
+// 	referenceHeight = int(data[SECRET_PLAYERS].Height) - MAX_DROP_HEIGHT
+// 	log.Printf("Waiting for players reaching height %d", referenceHeight)
 
-}
+// }
 
 func checkHeight() {
 	resp, err := http.Get("https://dips-plus-plus.xk.io/live_heights/global")
@@ -144,13 +142,13 @@ func notify(infoText string) {
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.Printf("Running with arguments: MAX_DROP_HEIGHT=%d, SECRET_PLAYERS=%d", MAX_DROP_HEIGHT, SECRET_PLAYERS)
+	// log.Printf("Running with arguments: MAX_DROP_HEIGHT=%d, SECRET_PLAYERS=%d", MAX_DROP_HEIGHT, SECRET_PLAYERS)
 
-	getReferenceHeight()
+	// getReferenceHeight()
 	checkHeight()
 
 	c := cron.New()
-	c.AddFunc("@daily", getReferenceHeight)
+	// c.AddFunc("@daily", getReferenceHeight)
 	c.AddFunc("@every 2m", checkHeight)
 	c.Start()
 
